@@ -1,5 +1,5 @@
 <template>
-  <div class="flex min-h-full min-w-full">
+  <div v-if="currentUser.id" class="flex min-h-full min-w-full">
     <!-- sidebar -->
 
     <sidebar :class="{ '-ml-[200px]': !sidebarOpened }" />
@@ -11,19 +11,25 @@
 
       <!-- dashboard -->
 
-      <main class="h-full p-6 bg-gray-200">
+      <main class="p-6 bg-gray-200">
         <div class="p-4 rounded bg-white">
           <router-view></router-view>
         </div>
       </main>
     </div>
   </div>
+  <div v-else class="min-h-full bg-gray-200 flex items-center justify-center">
+    <Spinner/>
+  </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import Sidebar from "./Sidebar.vue";
 import navbar from "./navbar.vue";
+import store from "../store";
+
+// const currentUser = computed(() => store.state.user.data);
 
 const props = defineProps({
   title: {
@@ -32,13 +38,16 @@ const props = defineProps({
   },
 });
 
+const currentUser = computed(() => store.state.user.data);
+
 onMounted(() => {
-    window.removeEventListener('resize' , handlesidebarOpened);
+  store.dispatch("getCurrentUser");
+  window.removeEventListener("resize", handlesidebarOpened);
 });
 
 onMounted(() => {
-    handlesidebarOpened();
-  window.addEventListener("resize" , handlesidebarOpened);
+  handlesidebarOpened();
+  window.addEventListener("resize", handlesidebarOpened);
 });
 
 function handlesidebarOpened() {

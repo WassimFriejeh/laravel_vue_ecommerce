@@ -57,13 +57,61 @@
           >
         </div>
       </div>
-      <div>
+      <div class="">
         <button
+          :disabled="loading"
           type="submit"
           class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          :class="{
+            'cursor-not-allowed': loading,
+            'hover:bg-indigo-500': loading,
+          }"
         >
+          <svg
+            v-if="loading"
+            class="animate-spin -ml-1 mr-3 h-4 w-4 text-white mt-1"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
           Sign in
         </button>
+      </div>
+      <div
+        v-if="errorMsg"
+        class="flex items-center justify-between py-3 px-5 bg-red-500 text-white rounded"
+      >
+        {{ errorMsg }}
+        <span @click="errorMsg = ''" class="">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-6 h-6 transition-colors hover:bg-neutral-600 rounded-full"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </span>
       </div>
     </form>
   </GuestLayout>
@@ -81,20 +129,24 @@ let errorMsg = ref("");
 const user = {
   email: "",
   password: "",
-  remember: false
+  remember: false,
 };
-
+function delay(milliseconds) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
 function login() {
   loading.value = true;
-  store.dispatch('login', user)
+  delay(10000);
+  store
+    .dispatch("login", user)
     .then(() => {
       loading.value = false;
-      router.push({name: 'app.dashboard'})
+      router.push({ name: "app.dashboard" });
     })
-    .catch(({response}) => {
+    .catch(({ response }) => {
       loading.value = false;
       errorMsg.value = response.data.message;
-    })
+    });
 }
 </script>
 <style scoped></style>

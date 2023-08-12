@@ -1,9 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+
+use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use PHPUnit\TextUI\Configuration\Source;
 
 class AuthController extends Controller
 {
@@ -35,8 +39,9 @@ class AuthController extends Controller
         $token = $user->createToken('main')->plainTextToken;
         // dd("fuck my life");
         return response([
-            'user' => $user,
+            'user' => new UserResource($user),
             'token' => $token,
+
         ]);
     }
 
@@ -45,8 +50,13 @@ class AuthController extends Controller
 
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        $user->currentAccessToken()->delete();
+        $user->tokens()->delete();
 
         return response(['', 204]);
+    }
+
+    public function getUser(Request $request)
+    {
+        return new UserResource($request->user());
     }
 }
